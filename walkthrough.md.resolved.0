@@ -1,0 +1,50 @@
+# Game Dev News Notifier Walkthrough
+
+매일 아침 9시 50분에 게임 개발 관련 뉴스를 수집하고 3줄 요약하여 디스코드에 전송하는 프로그램입니다.
+
+## 1. 사전 준비
+1. **Discord Webhook URL 확인**: 디스코드 채널 설정 > 연동 > 웹후크 만들기에서 URL을 복사하세요.
+2. **OpenAI API Key (선택 사항)**: 고품질 요약을 원한다면 [OpenAI Platform](https://platform.openai.com/)에서 API Key를 발급받으세요. (없어도 제목 번역/기본 발췌 기능으로 동작합니다.)
+
+## 2. 설정
+[config.json](file:///C:/Users/USER/.gemini/antigravity/brain/79655815-51cc-45f9-a4e5-d0c2b9fc08d5/config.json) 파일을 열어 다음 항목을 입력하세요.
+
+```json
+{
+    "discord_webhook_url": "여기에_웹후크_URL_입력",
+    "openai_api_key": "여기에_API_KEY_입력 (없으면 그대로 두기)",
+    "scheduled_time": "09:50",
+    "rss_feeds": [
+        "https://www.gamedeveloper.com/rss.xml",
+        "https://www.gamesindustry.biz/rss/news"
+    ]
+}
+```
+
+## 3. 실행 방법
+**간편 실행**:
+폴더 내의 [run.bat](file:///C:/Users/USER/.gemini/antigravity/brain/79655815-51cc-45f9-a4e5-d0c2b9fc08d5/run.bat) 파일을 더블 클릭하세요. 자동으로 가상 환경을 만들고 필요한 라이브러리를 설치한 후 프로그램을 실행합니다.
+
+**수동 실행**:
+터미널에서 다음 명령어를 입력하세요.
+```bash
+# 가상 환경 생성 및 활성화
+python -m venv venv
+venv\Scripts\activate
+
+# 의존성 설치
+pip install -r requirements.txt
+
+# 실행
+python src/main.py
+```
+
+## 4. 테스트
+즉시 뉴스를 수집하여 전송 테스트를 하려면 다음 명령어를 사용하세요 (또는 [run.bat](file:///C:/Users/USER/.gemini/antigravity/brain/79655815-51cc-45f9-a4e5-d0c2b9fc08d5/run.bat)를 실행할 때 뒤에 붙여쓰기는 어려우니 터미널에서 실행 권장):
+```bash
+python src/main.py --run-now
+```
+> [run.bat](file:///C:/Users/USER/.gemini/antigravity/brain/79655815-51cc-45f9-a4e5-d0c2b9fc08d5/run.bat) 파일은 기본적으로 스케줄러 모드로 실행됩니다.
+
+## 5. 결과물
+디스코드 채널에 10개의 최신 기사가 3줄 요약과 함께 전송됩니다.

@@ -1,0 +1,39 @@
+# GitHub Actions 배포 가이드
+
+컴퓨터를 켜두지 않고 **GitHub**라는 무료 클라우드 저장소를 이용해 프로그램을 매일 실행하는 방법입니다.
+
+## 1. GitHub 계정 준비
+1. [GitHub.com](https://github.com/)에 가입하고 로그인합니다.
+2. 우측 상단 `+` 버튼 -> **New repository** 클릭.
+3. Repository name을 `game-news-bot` 등으로 짓고 **Private(비공개)**로 설정한 뒤 `Create repository`를 누릅니다. (API Key 보호를 위해 비공개 추천)
+
+## 2. 코드 업로드
+작성된 코드를 GitHub에 올립니다. (Git을 설치해야 합니다)
+
+```bash
+# 프로젝트 폴더에서 터미널(CMD) 열기
+git init
+git add .
+git commit -m "First commit"
+git branch -M main
+git remote add origin https://github.com/[내아이디]/game-news-bot.git
+git push -u origin main
+```
+> Git 사용이 어렵다면 GitHub 웹사이트의 `Upload files` 버튼을 이용해 파일들을 드래그 앤 드롭으로 올려도 됩니다. (`.github/workflows/daily.yml` 폴더 구조를 꼭 지켜야 합니다)
+
+## 3. 비밀(Secret) 설정 (중요!)
+`config.json`을 올리지 않거나 보안을 위해, GitHub 설정에서 키를 등록해야 합니다.
+
+1. 생성한 GitHub 저장소 페이지에서 **Settings** > **Secrets and variables** > **Actions** 메뉴로 이동.
+2. **New repository secret** 버튼 클릭.
+3. 다음 두 가지를 추가:
+    - Name: `DISCORD_WEBHOOK_URL` / Secret: (내용 붙여넣기)
+    - Name: `OPENAI_API_KEY` / Secret: (내용 붙여넣기)
+
+## 4. 작동 확인
+1. **Actions** 탭으로 이동합니다.
+2. `Daily Game News` 워크플로우가 보입니다.
+3. 수동으로 테스트하려면 `Run workflow` 버튼을 눌러보세요.
+4. 이제 매일 한국 시간 **09:50**에 자동으로 실행됩니다.
+
+> **참고**: GitHub Actions는 서버가 미국에 있어(UTC) 시간 설정이 `cron: '50 0 * * *'` (UTC 00:50 = KST 09:50)로 되어 있습니다.

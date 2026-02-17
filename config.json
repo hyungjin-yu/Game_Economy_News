@@ -1,0 +1,9 @@
+{
+    "discord_webhook_url": "https://discord.com/api/webhooks/1457610500325118007/qx7g9NU-BqwEjEpzGbpkB6QcvOvbtWgFrGzKi000zvYHPV4nlJV7Ow18BmDsdpw_TONC",
+    "openai_api_key": "sk-proj-9c8hyQ98RegU2fy6zWYiGNdeNXOPtXzKwfZPCk93KnXwxqBzSB284cIe3Lh7kaA_5DycvY7BIJT3BlbkFJdBZ6AVPsdyYjZg1X2kbvZdjBY5-vtmT8FF_DJJzj42SZXiW2gzAuDIGhRSIQExiNh_PUstIS0Av",
+    "scheduled_time": "09:50",
+    "rss_feeds": [
+        "https://www.gamedeveloper.com/rss.xml",
+        "https://www.gamesindustry.biz/rss/news"
+    ]
+}
