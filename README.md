@@ -25,7 +25,8 @@ GitHub Actions를 이용해 **무료로 24시간 자동화**할 수 있습니다
 
 | Name | Description | 비고 |
 |------|-------------|------|
-| `DISCORD_WEBHOOK_URL` | 뉴스를 받을 디스코드 채널의 웹훅 주소 | **필수** |
+| `DISCORD_WEBHOOK_URL` | 일반 게임 뉴스 웹훅 주소 (Game Developer) | **필수** |
+| `DISCORD_ECONOMY_WEBHOOK_URL` | 경제 뉴스 웹훅 주소 (GamesIndustry.biz) | **필수** |
 | `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/app/apikey)에서 발급받은 무료 API 키 | **추천 (무료)** |
 | `OPENAI_API_KEY` | OpenAI API 키 | 선택 사항 (유료) |
 

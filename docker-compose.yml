@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     environment:
       - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - DISCORD_ECONOMY_WEBHOOK_URL=${DISCORD_ECONOMY_WEBHOOK_URL}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
