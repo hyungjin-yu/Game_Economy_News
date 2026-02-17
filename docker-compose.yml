@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  game-news-bot:
+    build: .
+    container_name: game-news-bot
+    restart: unless-stopped
+    environment:
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./config.json:/app/config.json
+      - ./activity.log:/app/activity.log

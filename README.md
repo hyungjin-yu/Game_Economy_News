@@ -53,6 +53,22 @@ GitHub Actions를 이용해 **무료로 24시간 자동화**할 수 있습니다
 2. **설정 (`config.json`)**:
    파일을 열어 웹훅 주소와 API 키를 입력하세요.
 
+## 🐳 Docker 실행 방법
+Docker가 설치되어 있다면 간편하게 실행할 수 있습니다.
+
+1. **이미지 빌드 및 실행**:
+   ```bash
+   docker-compose up -d --build
+   ```
+2. **환경 변수 설정**:
+   `.env` 파일을 만들어서 키를 관리하거나 `docker-compose.yml`을 직접 수정하세요.
+
+```bash
+# .env 파일 예시
+DISCORD_WEBHOOK_URL=your_webhook_url
+GEMINI_API_KEY=your_gemini_key
+```
+
 ## 🛠 기술 스택
 - **Language**: Python 3.9
 - **Libraries**: `feedparser` (RSS), `requests` (Webhook), `google-generativeai` (AI Summary), `schedule`
