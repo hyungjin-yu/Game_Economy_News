@@ -28,6 +28,7 @@ jobs:
       - name: Run News Notifier
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_ECONOMY_WEBHOOK_URL: ${{ secrets.DISCORD_ECONOMY_WEBHOOK_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python src/main.py --run-now

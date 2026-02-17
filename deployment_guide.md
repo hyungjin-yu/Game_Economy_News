@@ -26,9 +26,10 @@ git push -u origin main
 
 1. 생성한 GitHub 저장소 페이지에서 **Settings** > **Secrets and variables** > **Actions** 메뉴로 이동.
 2. **New repository secret** 버튼 클릭.
-3. 다음 두 가지를 추가:
-    - Name: `DISCORD_WEBHOOK_URL` / Secret: (내용 붙여넣기)
-    - Name: `GEMINI_API_KEY` / Secret: (내용 붙여넣기)
+3. 다음 세 가지를 추가:
+    - Name: `DISCORD_WEBHOOK_URL` / Secret: (일반 게임 뉴스 웹훅)
+    - Name: `DISCORD_ECONOMY_WEBHOOK_URL` / Secret: (경제 뉴스 웹훅 - GamesIndustry.biz)
+    - Name: `GEMINI_API_KEY` / Secret: (Gemini API 키)
       > **Gemini API Key 무료로 받기**: [Google AI Studio](https://aistudio.google.com/app/apikey)에서 무료로 발급받을 수 있습니다.
 
     *OpenAI API Key는 유료이므로 삭제하거나 비워두셔도 됩니다.*

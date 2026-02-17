@@ -27,40 +27,61 @@ def job():
     try:
         config_manager = ConfigManager()
         
-        rss_urls = config_manager.get("rss_feeds", [])
-        scraper = NewsScraper(rss_urls)
-        news_items = scraper.fetch_latest_news(10)
-        
-        if not news_items:
-            logging.info("No news items found.")
-            return
+        # Determine feeds structure
+        feeds_config = config_manager.get("feeds")
+        if not feeds_config:
+            # Legacy support
+            logging.info("Using legacy rss_feeds config.")
+            feeds_config = {
+                "general": config_manager.get("rss_feeds", [])
+            }
 
+        # API Keys setup
         openai_key = config_manager.get("openai_api_key")
-        if openai_key == "YOUR_OPENAI_API_KEY_HERE":
-            openai_key = None
+        if openai_key == "YOUR_OPENAI_API_KEY_HERE": openai_key = None
             
         gemini_key = config_manager.get("gemini_api_key")
-        if gemini_key == "YOUR_GEMINI_API_KEY_HERE":
-            gemini_key = None
+        if gemini_key == "YOUR_GEMINI_API_KEY_HERE": gemini_key = None
             
         summarizer = Summarizer(openai_api_key=openai_key, gemini_api_key=gemini_key)
-        
-        # Process summaries
-        logging.info(f"Summarizing {len(news_items)} articles...")
-        for item in news_items:
-            # feedparser usually puts content in 'summary' or 'description'
-            content = item.get('summary', '') or item.get('description', '')
-            item['summary_text'] = summarizer.summarize(content, item.title)
-        
-        webhook_url = config_manager.get("discord_webhook_url")
-        if webhook_url and webhook_url != "YOUR_WEBHOOK_URL_HERE":
-            sender = DiscordSender(webhook_url)
-            sender.send_news(news_items)
-            logging.info("News sent to Discord successfully.")
-            print("News sent to Discord successfully.")
-        else:
-            logging.warning("Discord Webhook URL not configured.")
+
+        # Process each category
+        for category, urls in feeds_config.items():
+            if not urls:
+                continue
+                
+            logging.info(f"Processing category: {category}")
             
+            # Determine Webhook URL based on category
+            if category == "economy":
+                webhook_url = config_manager.get("discord_economy_webhook_url")
+            else:
+                webhook_url = config_manager.get("discord_webhook_url")
+
+            if not webhook_url or "YOUR_" in webhook_url:
+                logging.warning(f"Webhook URL for {category} not configured. Skipping.")
+                continue
+
+            # Scrape
+            scraper = NewsScraper(urls)
+            news_items = scraper.fetch_latest_news(5) # Fetch top 5 per category
+            
+            if not news_items:
+                logging.info(f"No news items found for {category}.")
+                continue
+
+            # Summarize
+            logging.info(f"Summarizing {len(news_items)} articles for {category}...")
+            for item in news_items:
+                content = item.get('summary', '') or item.get('description', '')
+                item['summary_text'] = summarizer.summarize(content, item.title)
+            
+            # Send
+            sender = DiscordSender(webhook_url)
+            # Add category prefix to title for clarity? Optional.
+            sender.send_news(news_items)
+            logging.info(f"{category.capitalize()} news sent to Discord successfully.")
+
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         print(f"An error occurred: {e}")

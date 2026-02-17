@@ -9,10 +9,11 @@
 - [x] 요약 모듈 구현
     - [x] 기사 내용 3줄 요약 로직 (OpenAI API 또는 NLP 라이브러리 활용 옵션 제공)
     - [x] 한국어 번역/요약 (필요 시)
-    - [ ] Google Gemini API 연동 (무료 등급 활용)
+    - [x] Google Gemini API 연동 (무료 등급 활용)
 - [x] 디스코드 연동 모듈 구현
     - [x] Webhook 전송 기능
     - [x] 메시지 포맷팅 (Embed 등 활용)
+    - [ ] 뉴스 카테고리 분리 (General / Economy) 및 개별 Webhook 전송 구현
 - [x] 스케줄러 및 실행 환경 구축
     - [x] 매일 09:50 실행 로직 (`schedule` 라이브러리 또는 OS 스케줄러)
     - [x] 백그라운드 실행 지원 (GUI 또는 시스템 트레이 옵션 고려)
@@ -25,5 +26,6 @@
     - [x] GitHub Actions 워크플로우 생성 (`.github/workflows/daily.yml`)
     - [x] 환경 변수 지원 업데이트 (`config_manager.py`)
     - [x] 클라우드 배포 가이드 작성 (`deployment_guide.md`)
+    - [x] Docker 지원 추가 (`Dockerfile`, `docker-compose.yml`)
 - [x] 문서화
     - [x] `walkthrough.md` 작성
