@@ -4,7 +4,9 @@
 
 ## 1. 사전 준비
 1. **Discord Webhook URL 확인**: 디스코드 채널 설정 > 연동 > 웹후크 만들기에서 URL을 복사하세요.
-2. **OpenAI API Key (선택 사항)**: 고품질 요약을 원한다면 [OpenAI Platform](https://platform.openai.com/)에서 API Key를 발급받으세요. (없어도 제목 번역/기본 발췌 기능으로 동작합니다.)
+2. **AI API Key (요약용)**:
+    - **Google Gemini API (추천/무료)**: [Google AI Studio](https://aistudio.google.com/app/apikey)에서 키를 발급받으세요. 무료 등급으로도 충분합니다.
+    - **OpenAI API Key (유료)**: 기존처럼 OpenAI를 써도 됩니다.
 
 ## 2. 설정
 `config.json` 파일을 열어 다음 항목을 입력하세요.
@@ -12,7 +14,8 @@
 ```json
 {
     "discord_webhook_url": "여기에_웹후크_URL_입력",
-    "openai_api_key": "여기에_API_KEY_입력 (없으면 그대로 두기)",
+    "gemini_api_key": "여기에_GEMINI_API_KEY_입력 (추천)",
+    "openai_api_key": "여기에_OPENAI_API_KEY_입력 (비워둬도 됨)",
     "scheduled_time": "09:50",
     "rss_feeds": [
         "https://www.gamedeveloper.com/rss.xml",

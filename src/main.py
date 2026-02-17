@@ -35,12 +35,15 @@ def job():
             logging.info("No news items found.")
             return
 
-        api_key = config_manager.get("openai_api_key")
-        # Handle placeholder
-        if api_key == "YOUR_OPENAI_API_KEY_HERE":
-            api_key = None
+        openai_key = config_manager.get("openai_api_key")
+        if openai_key == "YOUR_OPENAI_API_KEY_HERE":
+            openai_key = None
             
-        summarizer = Summarizer(api_key)
+        gemini_key = config_manager.get("gemini_api_key")
+        if gemini_key == "YOUR_GEMINI_API_KEY_HERE":
+            gemini_key = None
+            
+        summarizer = Summarizer(openai_api_key=openai_key, gemini_api_key=gemini_key)
         
         # Process summaries
         logging.info(f"Summarizing {len(news_items)} articles...")

@@ -28,7 +28,10 @@ git push -u origin main
 2. **New repository secret** 버튼 클릭.
 3. 다음 두 가지를 추가:
     - Name: `DISCORD_WEBHOOK_URL` / Secret: (내용 붙여넣기)
-    - Name: `OPENAI_API_KEY` / Secret: (내용 붙여넣기)
+    - Name: `GEMINI_API_KEY` / Secret: (내용 붙여넣기)
+      > **Gemini API Key 무료로 받기**: [Google AI Studio](https://aistudio.google.com/app/apikey)에서 무료로 발급받을 수 있습니다.
+
+    *OpenAI API Key는 유료이므로 삭제하거나 비워두셔도 됩니다.*
 
 ## 4. 작동 확인
 1. **Actions** 탭으로 이동합니다.
