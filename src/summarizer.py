@@ -11,7 +11,7 @@ class Summarizer:
         
         if self.gemini_api_key:
             genai.configure(api_key=self.gemini_api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
             self.mode = "gemini"
         elif self.openai_api_key:
             openai.api_key = self.openai_api_key
