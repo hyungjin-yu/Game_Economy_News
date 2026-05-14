@@ -1,6 +1,7 @@
 {
     "discord_webhook_url": "YOUR_WEBHOOK_URL_HERE",
     "discord_economy_webhook_url": "YOUR_ECONOMY_WEBHOOK_URL_HERE",
+    "discord_world_it_webhook_url": "YOUR_WORLD_IT_WEBHOOK_URL_HERE",
     "gemini_api_key": "YOUR_GEMINI_API_KEY_HERE",
     "openai_api_key": "YOUR_OPENAI_API_KEY_HERE",
     "scheduled_time": "09:50",
@@ -10,6 +11,11 @@
         ],
         "economy": [
             "https://www.gamesindustry.biz/rss/news"
+        ],
+        "world_it": [
+            "https://techcrunch.com/feed/",
+            "https://feeds.arstechnica.com/arstechnica/index",
+            "https://www.theverge.com/rss/index.xml"
         ]
     }
 }

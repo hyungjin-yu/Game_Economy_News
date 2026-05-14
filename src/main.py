@@ -4,14 +4,16 @@ import os
 import requests
 import schedule
 import sys
+import tempfile
 import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config_manager import ConfigManager
+from src.discord_sender import DiscordSender
+from src.image_creator import create_instagram_card
 from src.news_scraper import NewsScraper
 from src.summarizer import Summarizer
-from src.discord_sender import DiscordSender
 
 logging.basicConfig(
     filename='activity.log',
@@ -34,85 +36,97 @@ def _load_seen_urls() -> set:
 
 def _save_seen_urls(seen: set):
     os.makedirs(os.path.dirname(_SEEN_URLS_FILE), exist_ok=True)
-    urls = list(seen)[-_MAX_SEEN:]
     with open(_SEEN_URLS_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'urls': urls}, f, ensure_ascii=False, indent=2)
+        json.dump({'urls': list(seen)[-_MAX_SEEN:]}, f, ensure_ascii=False, indent=2)
 
 
 def _notify_error(webhook_url: str, error: Exception):
     if not webhook_url or "YOUR_" in webhook_url:
         return
     try:
-        requests.post(webhook_url, json={
-            "content": f"⚠️ **Game Economy News 봇 오류**\n```{str(error)[:1000]}```"
-        }, timeout=5)
+        requests.post(
+            webhook_url,
+            json={"content": f"⚠️ **Game Economy News 봇 오류**\n```{str(error)[:1000]}```"},
+            timeout=5,
+        )
     except Exception:
         pass
+
+
+def _get_webhook(config: ConfigManager, category: str) -> str:
+    mapping = {
+        'economy':  'discord_economy_webhook_url',
+        'world_it': 'discord_world_it_webhook_url',
+    }
+    key = mapping.get(category, 'discord_webhook_url')
+    return config.get(key, '')
 
 
 def job():
     logging.info("Starting scheduled job...")
     print("Starting scheduled job...")
 
-    config_manager = ConfigManager()
-    general_webhook = config_manager.get("discord_webhook_url", "")
+    config = ConfigManager()
+    general_webhook = config.get('discord_webhook_url', '')
 
     try:
-        feeds_config = config_manager.get("feeds")
+        feeds_config = config.get('feeds')
         if not feeds_config:
-            logging.info("Using legacy rss_feeds config.")
-            feeds_config = {"general": config_manager.get("rss_feeds", [])}
+            feeds_config = {'general': config.get('rss_feeds', [])}
 
-        openai_key = config_manager.get("openai_api_key")
-        if openai_key == "YOUR_OPENAI_API_KEY_HERE":
+        openai_key = config.get('openai_api_key')
+        if openai_key == 'YOUR_OPENAI_API_KEY_HERE':
             openai_key = None
-
-        gemini_key = config_manager.get("gemini_api_key")
-        if gemini_key == "YOUR_GEMINI_API_KEY_HERE":
+        gemini_key = config.get('gemini_api_key')
+        if gemini_key == 'YOUR_GEMINI_API_KEY_HERE':
             gemini_key = None
 
         summarizer = Summarizer(openai_api_key=openai_key, gemini_api_key=gemini_key)
         seen_urls = _load_seen_urls()
+        tmp_dir = tempfile.mkdtemp()
 
         for category, urls in feeds_config.items():
             if not urls:
                 continue
 
+            webhook_url = _get_webhook(config, category)
+            if not webhook_url or 'YOUR_' in webhook_url:
+                logging.warning(f"Webhook for '{category}' not configured. Skipping.")
+                continue
+
             logging.info(f"Processing category: {category}")
 
-            if category == "economy":
-                webhook_url = config_manager.get("discord_economy_webhook_url")
-            else:
-                webhook_url = general_webhook
-
-            if not webhook_url or "YOUR_" in webhook_url:
-                logging.warning(f"Webhook URL for {category} not configured. Skipping.")
-                continue
-
             scraper = NewsScraper(urls)
-            all_items = scraper.fetch_latest_news(10)
+            all_items = scraper.fetch_latest_news(15)
 
-            # 중복 제거
-            new_items = [item for item in all_items if item.link not in seen_urls]
+            new_items = [item for item in all_items if item.link not in seen_urls][:5]
             if not new_items:
-                logging.info(f"No new articles for {category} (all already sent).")
+                logging.info(f"No new articles for '{category}'.")
                 continue
 
-            new_items = new_items[:5]
-            logging.info(f"Summarizing {len(new_items)} new articles for {category}...")
+            logging.info(f"{len(new_items)} new articles for '{category}'.")
+            sender = DiscordSender(webhook_url)
+            sender.send_header(category, len(new_items))
 
             for item in new_items:
-                # 기사 본문 우선, 없으면 RSS 요약으로 폴백
                 body = scraper.fetch_article_content(item.link)
                 content = body or item.get('summary', '') or item.get('description', '')
                 item['summary_text'] = summarizer.summarize(content, item.title)
 
-            sender = DiscordSender(webhook_url)
-            sender.send_news(new_items)
-            logging.info(f"{category.capitalize()} news sent to Discord successfully.")
+                card_path = os.path.join(tmp_dir, f"card_{abs(hash(item.link))}.png")
+                create_instagram_card(
+                    title=item.title,
+                    summary=item['summary_text'],
+                    source=item.get('source', ''),
+                    category=category,
+                    output_path=card_path,
+                )
+                sender.send_card(item, card_path)
+                os.unlink(card_path)
 
-            for item in new_items:
                 seen_urls.add(item.link)
+
+            logging.info(f"'{category}' done.")
 
         _save_seen_urls(seen_urls)
 
@@ -123,18 +137,17 @@ def job():
 
 
 def main():
-    if len(sys.argv) > 1 and sys.argv[1] == "--run-now":
+    if len(sys.argv) > 1 and sys.argv[1] == '--run-now':
         job()
         return
 
     print("Game Dev News Notifier started in Loop Mode.")
-    logging.info("Game Dev News Notifier started in Loop Mode.")
+    logging.info("Game Dev News Notifier started.")
 
     try:
-        config_manager = ConfigManager()
-        scheduled_time = config_manager.get("scheduled_time", "09:50")
+        scheduled_time = ConfigManager().get('scheduled_time', '09:50')
     except Exception:
-        scheduled_time = "09:50"
+        scheduled_time = '09:50'
 
     print(f"Scheduled to run at {scheduled_time} daily.")
     schedule.every().day.at(scheduled_time).do(job)
@@ -144,5 +157,5 @@ def main():
         time.sleep(60)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
