@@ -4,14 +4,12 @@ import os
 import requests
 import schedule
 import sys
-import tempfile
 import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config_manager import ConfigManager
 from src.discord_sender import DiscordSender
-from src.image_creator import create_instagram_card
 from src.news_scraper import NewsScraper
 from src.summarizer import Summarizer
 
@@ -41,12 +39,12 @@ def _save_seen_urls(seen: set):
 
 
 def _notify_error(webhook_url: str, error: Exception):
-    if not webhook_url or "YOUR_" in webhook_url:
+    if not webhook_url or 'YOUR_' in webhook_url:
         return
     try:
         requests.post(
             webhook_url,
-            json={"content": f"⚠️ **Game Economy News 봇 오류**\n```{str(error)[:1000]}```"},
+            json={'content': f'⚠️ **Game Economy News 봇 오류**\n```{str(error)[:1000]}```'},
             timeout=5,
         )
     except Exception:
@@ -58,8 +56,7 @@ def _get_webhook(config: ConfigManager, category: str) -> str:
         'economy':  'discord_economy_webhook_url',
         'world_it': 'discord_world_it_webhook_url',
     }
-    key = mapping.get(category, 'discord_webhook_url')
-    return config.get(key, '')
+    return config.get(mapping.get(category, 'discord_webhook_url'), '')
 
 
 def job():
@@ -83,7 +80,6 @@ def job():
 
         summarizer = Summarizer(openai_api_key=openai_key, gemini_api_key=gemini_key)
         seen_urls = _load_seen_urls()
-        tmp_dir = tempfile.mkdtemp()
 
         for category, urls in feeds_config.items():
             if not urls:
@@ -98,34 +94,22 @@ def job():
 
             scraper = NewsScraper(urls)
             all_items = scraper.fetch_latest_news(15)
-
             new_items = [item for item in all_items if item.link not in seen_urls][:5]
+
             if not new_items:
                 logging.info(f"No new articles for '{category}'.")
                 continue
 
             logging.info(f"{len(new_items)} new articles for '{category}'.")
-            sender = DiscordSender(webhook_url)
-            sender.send_header(category, len(new_items))
 
             for item in new_items:
                 body = scraper.fetch_article_content(item.link)
                 content = body or item.get('summary', '') or item.get('description', '')
                 item['summary_text'] = summarizer.summarize(content, item.title)
-
-                card_path = os.path.join(tmp_dir, f"card_{abs(hash(item.link))}.png")
-                create_instagram_card(
-                    title=item.title,
-                    summary=item['summary_text'],
-                    source=item.get('source', ''),
-                    category=category,
-                    output_path=card_path,
-                )
-                sender.send_card(item, card_path)
-                os.unlink(card_path)
-
                 seen_urls.add(item.link)
 
+            sender = DiscordSender(webhook_url)
+            sender.send_news(new_items, category)
             logging.info(f"'{category}' done.")
 
         _save_seen_urls(seen_urls)
@@ -141,7 +125,7 @@ def main():
         job()
         return
 
-    print("Game Dev News Notifier started in Loop Mode.")
+    print("Game Dev News Notifier started.")
     logging.info("Game Dev News Notifier started.")
 
     try:
